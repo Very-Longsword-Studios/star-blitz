@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ad7a24516d65caf808551b4d37e1a8c, type: 3}
+  m_Name: TEMPEST
+  m_EditorClassIdentifier: StarBlitz.Runtime::StarBlitz.Data.ShipData
+  displayName: TEMPEST
+  role: Elite multirole
+  description: Advanced systems combine speed, shielding and rapid fire.
+  unlockCost: 1100
+  engineColor: {r: 1, g: 0.35, b: 0.55, a: 1}
+  sprite: {fileID: -4118989959760102182, guid: 8fdebeef8ee881a4fa4528374ecd06e5, type: 3}
+  weapon: {fileID: 11400000, guid: ffaabe672668d9146a0b34dd47e49918, type: 2}
+  hull: 140
+  shield: 100
+  shieldRegen: 6
+  shieldRegenDelay: 3
+  moveSpeed: 11
+  radius: 0.21
+  visualSize: 1.15
+  bombs: 2
+  damagePerLevel: 0.15
+  fireRatePerLevel: 0.1
+  speedPerLevel: 0.08
+  shieldPerLevel: 0.2

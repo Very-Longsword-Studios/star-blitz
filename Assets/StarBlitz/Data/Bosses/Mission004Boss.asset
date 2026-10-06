@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe9d781d637a55d5a3f0c5a8a8f656b8, type: 3}
+  m_Name: Dreadnought
+  m_EditorClassIdentifier: 
+  displayName: ORBITAL MAW 04
+  pattern: 3
+  flight: 4
+  sprite: {fileID: 6416420798109315280, guid: 50c80f51f24363a49b0f250d7f24596a, type: 3}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  health: 8678.5
+  speed: 1.4
+  radius: 0.9
+  visualSize: 2.8
+  contactDamage: 25
+  weapon: {fileID: 11400000, guid: 9172a17b609e5808b11cc6a4999227da, type: 2}
+  fireInterval: 1.55
+  shotCount: 12
+  spreadAngle: 15
+  sineAmplitude: 1.5
+  sineFrequency: 0.685
+  score: 2500
+  coins: 1
+  dropChance: 0.3
+  bossPhaseThreshold: 0.7
+  bossPhaseFireMultiplier: 0.85
+  bossPhaseExtraShots: 2
+  holdY: 3.2

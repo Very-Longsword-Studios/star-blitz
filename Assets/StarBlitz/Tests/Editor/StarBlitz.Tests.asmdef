@@ -1,0 +1,15 @@
+{
+  "name": "StarBlitz.Tests",
+  "references": [
+    "StarBlitz.Runtime",
+    "StarBlitz.Editor",
+    "Unity.InputSystem", "Unity.InputSystem.TestFramework"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "optionalUnityReferences": [
+    "TestAssemblies"
+  ]
+}
+

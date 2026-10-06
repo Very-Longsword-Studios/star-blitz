@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe9d781d637a55d5a3f0c5a8a8f656b8, type: 3}
+  m_Name: Dreadnought
+  m_EditorClassIdentifier: 
+  displayName: TWIN SERAPH
+  pattern: 2
+  flight: 4
+  sprite: {fileID: 21300000, guid: 44250dce4516a2d4592df0e94dcd974e, type: 3}
+  tint: {r: 1, g: 1, b: 1, a: 1}
+  health: 1320
+  speed: 1.4
+  radius: 0.9
+  visualSize: 2.8
+  contactDamage: 25
+  weapon: {fileID: 11400000, guid: 9172a17b609e5808b11cc6a4999227da, type: 2}
+  fireInterval: 1.3
+  shotCount: 5
+  spreadAngle: 15
+  sineAmplitude: 1.5
+  sineFrequency: 0.63
+  score: 2500
+  coins: 1
+  dropChance: 0.3
+  bossPhaseThreshold: 0.5
+  bossPhaseFireMultiplier: 0.78
+  bossPhaseExtraShots: 2
+  holdY: 4.4

@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ad7a24516d65caf808551b4d37e1a8c, type: 3}
+  m_Name: PHANTOM
+  m_EditorClassIdentifier: StarBlitz.Runtime::StarBlitz.Data.ShipData
+  displayName: PHANTOM
+  role: Precision striker
+  description: High-impact rounds in a sleek, agile strike frame.
+  unlockCost: 220
+  engineColor: {r: 0.7, g: 0.4, b: 1, a: 1}
+  sprite: {fileID: 5415509760434482846, guid: 8fdebeef8ee881a4fa4528374ecd06e5, type: 3}
+  weapon: {fileID: 11400000, guid: d13e8fd2e35acd14aa3238ce7a153c37, type: 2}
+  hull: 90
+  shield: 65
+  shieldRegen: 6
+  shieldRegenDelay: 3
+  moveSpeed: 11
+  radius: 0.21
+  visualSize: 1.15
+  bombs: 2
+  damagePerLevel: 0.15
+  fireRatePerLevel: 0.1
+  speedPerLevel: 0.08
+  shieldPerLevel: 0.2

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="10" result="Passed" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-28 23:18:49Z" end-time="2026-09-28 23:18:50Z" duration="0.3486007">
+  <test-suite type="TestSuite" id="1000" name="Star Blitz" fullname="Star Blitz" runstate="Runnable" testcasecount="10" result="Passed" start-time="2026-09-28 23:18:49Z" end-time="2026-09-28 23:18:50Z" duration="0.348601" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="EditMode" />
+    </properties>
+    <test-suite type="Assembly" id="1014" name="StarBlitz.Tests.dll" fullname="E:/2.5D_retro_game/StarBlitzVerification/Library/ScriptAssemblies/StarBlitz.Tests.dll" runstate="Runnable" testcasecount="10" result="Passed" start-time="2026-09-28 23:18:49Z" end-time="2026-09-28 23:18:50Z" duration="0.338948" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="28408" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="EditMode" />
+        <property name="EditorOnly" value="True" />
+      </properties>
+      <test-suite type="TestSuite" id="1015" name="StarBlitz" fullname="StarBlitz" runstate="Runnable" testcasecount="10" result="Passed" start-time="2026-09-28 23:18:49Z" end-time="2026-09-28 23:18:50Z" duration="0.338556" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1016" name="Tests" fullname="StarBlitz.Tests" runstate="Runnable" testcasecount="10" result="Passed" start-time="2026-09-28 23:18:49Z" end-time="2026-09-28 23:18:50Z" duration="0.338398" total="10" passed="10" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestFixture" id="1001" name="ContentTests" fullname="StarBlitz.Tests.ContentTests" classname="StarBlitz.Tests.ContentTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-28 23:18:49Z" end-time="2026-09-28 23:18:49Z" duration="0.123633" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1002" name="CampaignHasValidContent" fullname="StarBlitz.Tests.ContentTests.CampaignHasValidContent" methodname="CampaignHasValidContent" classname="StarBlitz.Tests.ContentTests" runstate="Runnable" seed="1112476095" result="Passed" start-time="2026-09-28 23:18:49Z" end-time="2026-09-28 23:18:49Z" duration="0.091561" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1004" name="FixedPoolDoesNotReuseActiveObjectsAndResetsReturnedObjects" fullname="StarBlitz.Tests.ContentTests.FixedPoolDoesNotReuseActiveObjectsAndResetsReturnedObjects" methodname="FixedPoolDoesNotReuseActiveObjectsAndResetsReturnedObjects" classname="StarBlitz.Tests.ContentTests" runstate="Runnable" seed="1870799910" result="Passed" start-time="2026-09-28 23:18:49Z" end-time="2026-09-28 23:18:49Z" duration="0.018005" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1003" name="UpgradeCostsStayPositiveAndIncrease" fullname="StarBlitz.Tests.ContentTests.UpgradeCostsStayPositiveAndIncrease" methodname="UpgradeCostsStayPositiveAndIncrease" classname="StarBlitz.Tests.ContentTests" runstate="Runnable" seed="245123693" result="Passed" start-time="2026-09-28 23:18:49Z" end-time="2026-09-28 23:18:49Z" duration="0.002757" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1005" name="InputTests" fullname="StarBlitz.Tests.InputTests" classname="StarBlitz.Tests.InputTests" runstate="Runnable" testcasecount="3" result="Passed" start-time="2026-09-28 23:18:49Z" end-time="2026-09-28 23:18:50Z" duration="0.159211" total="3" passed="3" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1008" name="BombPressDoesNotAlsoStartMovement" fullname="StarBlitz.Tests.InputTests.BombPressDoesNotAlsoStartMovement" methodname="BombPressDoesNotAlsoStartMovement" classname="StarBlitz.Tests.InputTests" runstate="Runnable" seed="401197478" result="Passed" start-time="2026-09-28 23:18:49Z" end-time="2026-09-28 23:18:50Z" duration="0.061153" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1007" name="RelativeDragDoesNotJumpOnInitialTouchOrReposition" fullname="StarBlitz.Tests.InputTests.RelativeDragDoesNotJumpOnInitialTouchOrReposition" methodname="RelativeDragDoesNotJumpOnInitialTouchOrReposition" classname="StarBlitz.Tests.InputTests" runstate="Runnable" seed="1629605763" result="Passed" start-time="2026-09-28 23:18:50Z" end-time="2026-09-28 23:18:50Z" duration="0.010544" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1006" name="TouchDragAndSecondFingerBombRemainIndependent" fullname="StarBlitz.Tests.InputTests.TouchDragAndSecondFingerBombRemainIndependent" methodname="TouchDragAndSecondFingerBombRemainIndependent" classname="StarBlitz.Tests.InputTests" runstate="Runnable" seed="2067294969" result="Passed" start-time="2026-09-28 23:18:50Z" end-time="2026-09-28 23:18:50Z" duration="0.085366" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+          </test-suite>
+          <test-suite type="TestFixture" id="1009" name="PolishTests" fullname="StarBlitz.Tests.PolishTests" classname="StarBlitz.Tests.PolishTests" runstate="Runnable" testcasecount="4" result="Passed" start-time="2026-09-28 23:18:50Z" end-time="2026-09-28 23:18:50Z" duration="0.054222" total="4" passed="4" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-case id="1013" name="CampaignHasEveryBossAndNoExtraCombatCoinSources" fullname="StarBlitz.Tests.PolishTests.CampaignHasEveryBossAndNoExtraCombatCoinSources" methodname="CampaignHasEveryBossAndNoExtraCombatCoinSources" classname="StarBlitz.Tests.PolishTests" runstate="Runnable" seed="7992206" result="Passed" start-time="2026-09-28 23:18:50Z" end-time="2026-09-28 23:18:50Z" duration="0.014870" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1010" name="EffectsStayMutedWhenMusicIsEnabled" fullname="StarBlitz.Tests.PolishTests.EffectsStayMutedWhenMusicIsEnabled" methodname="EffectsStayMutedWhenMusicIsEnabled" classname="StarBlitz.Tests.PolishTests" runstate="Runnable" seed="1870824924" result="Passed" start-time="2026-09-28 23:18:50Z" end-time="2026-09-28 23:18:50Z" duration="0.005527" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1012" name="LegacySaveMigratesWithoutLosingCoinsOrStars" fullname="StarBlitz.Tests.PolishTests.LegacySaveMigratesWithoutLosingCoinsOrStars" methodname="LegacySaveMigratesWithoutLosingCoinsOrStars" classname="StarBlitz.Tests.PolishTests" runstate="Runnable" seed="24446971" result="Passed" start-time="2026-09-28 23:18:50Z" end-time="2026-09-28 23:18:50Z" duration="0.010206" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+            </test-case>
+            <test-case id="1011" name="ShipPurchaseChargesOnceAndPersistsSelection" fullname="StarBlitz.Tests.PolishTests.ShipPurchaseChargesOnceAndPersistsSelection" methodname="ShipPurchaseChargesOnceAndPersistsSelection" classname="StarBlitz.Tests.PolishTests" runstate="Runnable" seed="481431709" result="Passed" start-time="2026-09-28 23:18:50Z" end-time="2026-09-28 23:18:50Z" duration="0.022261" asserts="0">
+              <properties>
+                <property name="retryIteration" value="0" />
+                <property name="repeatIteration" value="0" />
+              </properties>
+              <output><![CDATA[Saving results to: E:\2.5D_retro_game\StarBlitzVerification\visual-polish-tests.xml
+]]></output>
+            </test-case>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

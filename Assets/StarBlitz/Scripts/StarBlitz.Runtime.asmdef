@@ -1,0 +1,12 @@
+{
+  "name": "StarBlitz.Runtime",
+  "rootNamespace": "StarBlitz",
+  "references": [
+    "Unity.InputSystem",
+    "UnityEngine.UI",
+    "GoogleMobileAds",
+    "GoogleMobileAds.Core",
+    "GoogleMobileAds.Ump"
+  ],
+  "autoReferenced": true
+}

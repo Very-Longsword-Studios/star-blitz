@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 24515a2d6b0856259969a0dabb0c248e, type: 3}
+  m_Name: Balance
+  m_EditorClassIdentifier: 
+  halfWidth: 3.8
+  halfHeight: 7.6
+  playerBottom: -6.1
+  playerTop: 5.8
+  spawnY: 8.1
+  despawnY: -8.5
+  playerStartY: -4.8
+  hitInvulnerability: 0.65
+  touchOffset: 0.7
+  dropWeights: 32000000190000000f00000000000000000000000500000005000000
+  pickupSprites:
+  - {fileID: 21300000, guid: 5fdd2052a8305faf98be2c2e041c5afd, type: 3}
+  - {fileID: 21300000, guid: 5a89075e497157de96c66d1ce81afc0a, type: 3}
+  - {fileID: 21300000, guid: 9029f1a003965bbd9cacff5614cdeafd, type: 3}
+  - {fileID: 21300000, guid: ba231b92de5c523fbefc8dead03147f0, type: 3}
+  - {fileID: 21300000, guid: 9c37999c3c53531497bfc5971a62280f, type: 3}
+  - {fileID: 21300000, guid: 4601c91d336b59bc9a1cc6ed74ae976f, type: 3}
+  - {fileID: 21300000, guid: 72945d3180595db98e343d10be2a28e3, type: 3}
+  pickupFallSpeed: 1.5
+  pickupRadius: 0.25
+  pickupSize: 0.63
+  weaponDuration: 18
+  shieldDuration: 5
+  magnetDuration: 9
+  multiplierDuration: 10
+  magnetRadius: 5
+  magnetSpeed: 8
+  collectRadius: 0.5
+  coinPickup: 15
+  gemPickup: 1
+  scoreMultiplier: 2
+  bombCap: 9
+  bombDamage: 140
+  bombFlashDuration: 0.3
+  startingCoins: 0
+  upgradeBaseCost: 45
+  upgradeMaxLevel: 8
+  upgradeCostGrowth: 1.42
+  dailyCoins: 150
+  dailyGems: 1
+  rewardedCoins: 100
+  scorePerCoin: 250
+  threeStarHull: 0.75
+  twoStarHull: 0.35
+  bulletPool: 420
+  enemyPool: 60
+  particlePool: 480
+  pickupPool: 50
+  explosionParticles: 26
+  hitParticles: 4
+  particleLife: 0.5
+  particleSpeed: 4
+  particleSize: 0.16
+  shakeDuration: 0.18
+  shakeStrength: 0.08
+  starSpeed: 0.55
+  starCount: 36

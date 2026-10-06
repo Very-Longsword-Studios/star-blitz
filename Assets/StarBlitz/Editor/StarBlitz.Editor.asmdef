@@ -1,0 +1,11 @@
+{
+  "name": "StarBlitz.Editor",
+  "rootNamespace": "StarBlitz.Editor",
+  "references": [
+    "StarBlitz.Runtime"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "autoReferenced": true
+}

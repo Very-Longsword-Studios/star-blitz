@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7e677ac890d25ea2a7537ac22e2c1260, type: 3}
+  m_Name: Presentation
+  m_EditorClassIdentifier: 
+  font: {fileID: 12800000, guid: 6c81a139744e5d6b975ad671b8d00b7e, type: 3}
+  star: {fileID: 21300000, guid: 2faf1bd0b2165fc4b73eb8890d684e86, type: 3}
+  particle: {fileID: 21300000, guid: 94e3e1bb37d5518bb86b0e799baef825, type: 3}
+  shieldRing: {fileID: 21300000, guid: fa9a3c48c5055712ad492d398ff6d5e4, type: 3}
+  nebula: {fileID: 21300000, guid: 4b7d3ccb88d176b4aa3ef03b186ac56b, type: 3}
+  worldBackgrounds:
+  - {fileID: 4924629506082077760, guid: 9cf4f523b6a07144ab51f239350de2ab, type: 3}
+  - {fileID: -7873314270100261617, guid: 9cf4f523b6a07144ab51f239350de2ab, type: 3}
+  - {fileID: -9073930453708643488, guid: 9cf4f523b6a07144ab51f239350de2ab, type: 3}
+  - {fileID: -7044446464947959375, guid: 9cf4f523b6a07144ab51f239350de2ab, type: 3}
+  - {fileID: 6945864461001701516, guid: e095d32aba1035e4a948451bc6400ad1, type: 3}
+  - {fileID: -5722547340482780746, guid: e095d32aba1035e4a948451bc6400ad1, type: 3}
+  - {fileID: -7393907808661035585, guid: e095d32aba1035e4a948451bc6400ad1, type: 3}
+  - {fileID: -3636167436116684765, guid: e095d32aba1035e4a948451bc6400ad1, type: 3}
+  pulse: {fileID: 21300000, guid: ab16544ef7af4a547af9230139751a63, type: 3}
+  hostileOrb: {fileID: 21300000, guid: cb96cdaa8f8eccd4ba85e6e23d7de3d4, type: 3}
+  flame: {fileID: 21300000, guid: 01fb9fa49a6e11b4caa76253acc63b4c, type: 3}
+  blast: {fileID: 21300000, guid: 00e35e9f4facdaf4fadf852b8374cbae, type: 3}
+  ink: {r: 0.85, g: 0.94, b: 1, a: 1}
+  muted: {r: 0.58, g: 0.7, b: 0.8, a: 1}
+  accent: {r: 0.25, g: 0.91, b: 1, a: 1}
+  danger: {r: 1, g: 0.25, b: 0.42, a: 1}
+  panel: {r: 0.045, g: 0.07, b: 0.13, a: 0.96}
+  enableSfx: 1
+  playerHit: {fileID: 8300000, guid: 5dff12c717736b448aa61a87b96f8daa, type: 3}
+  fire: {fileID: 8300000, guid: 2b15e42ed55c0cb438487b30775cb372, type: 3}
+  enemyFire: {fileID: 8300000, guid: 028bfa6a58351534d9a9a964cfb6c514, type: 3}
+  explosion: {fileID: 8300000, guid: dc6d225358fd9be409e3edfe7e5cf177, type: 3}
+  pickup: {fileID: 8300000, guid: 97a720eb28438d84794d77883014d550, type: 3}
+  bomb: {fileID: 8300000, guid: 99b522fae456a884c94d6e75a9069970, type: 3}
+  click: {fileID: 8300000, guid: f94063f95ab592a419c2dbc8c439cc8c, type: 3}
+  victory: {fileID: 8300000, guid: 0ff0213a48e65be4b8f6f7d26a072532, type: 3}
+  menuMusic: {fileID: 8300000, guid: 0f012e9736a25b344a64c19dd67b3b58, type: 3}
+  music:
+  - {fileID: 8300000, guid: ee3f325f34fe004428ef196235d0e3fd, type: 3}
+  musicVolume: 0.38
+  sfxVolume: 0.32
+  minimumShotAudioInterval: 0.1
+  gameTitle: STAR BLITZ
+  subtitle: THE FRONTIER IS CALLING.
