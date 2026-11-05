@@ -17,7 +17,7 @@ MonoBehaviour:
   damage: 12
   speed: 15
   radius: 0.1
-  visualSize: 0.30
+  visualSize: 0.6
   spreadAngle: 12
   maximumTier: 3
   tint: {r: 0.5, g: 1, b: 1, a: 1}

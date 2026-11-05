@@ -157,7 +157,7 @@ public sealed class GameController : MonoBehaviour {
   var e=bullets.Take();if(!e)return;
   e.kind=friendly?EntityKind.PlayerBullet:EntityKind.EnemyBullet;e.Position=position;e.velocity=direction*w.speed;e.damage=damage;e.radius=w.radius;
   var sprite=friendly?art.pulse:art.hostileOrb;
-  float visual=size??(friendly?.52f:Mathf.Max(.27f,w.visualSize));
+  float visual=size??Mathf.Max(.27f,w.visualSize);
   Color color=tint??(friendly?ActiveShip.engineColor:new Color(1,.4f,.19f));
   e.Visual(sprite?sprite:w.projectile,visual,color,6);e.transform.rotation=Quaternion.Euler(0,0,Mathf.Atan2(direction.y,direction.x)*Mathf.Rad2Deg-90);
  }
