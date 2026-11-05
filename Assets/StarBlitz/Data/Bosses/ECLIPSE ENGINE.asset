@@ -17,7 +17,7 @@ MonoBehaviour:
   flight: 4
   sprite: {fileID: 21300000, guid: 424bf8aa3f5d3c5479d1ba08982bbef8, type: 3}
   tint: {r: 1, g: 1, b: 1, a: 1}
-  health: 1650
+  health: 19950
   speed: 1.4
   radius: 0.9
   visualSize: 2.8

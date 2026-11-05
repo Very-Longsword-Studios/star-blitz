@@ -10,6 +10,7 @@ public sealed class EnemyData : ScriptableObject {
  public Sprite sprite;
  public Color tint = Color.white;
  [Min(.1f)] public float health = 35, speed = 1.3f, radius = .35f, visualSize = 1.1f;
+ [Tooltip("Reference DPS this boss's health was authored against. 0 falls back to the first catalog ship.")] public float referenceDps;
  [Min(0)] public float contactDamage = 25;
  public WeaponData weapon;
  [Min(.1f)] public float fireInterval = 2;

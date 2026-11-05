@@ -43,20 +43,31 @@ public sealed class DevelopmentSmoke : MonoBehaviour {
   foreach(var boss in pool.Items.Where(e=>e.gameObject.activeSelf).ToArray())Call("KillEnemy",boss);Check(game.Won&&game.Save.Value.unlocked==2,"boss victory unlocks next mission");Check(game.RunCoins==1,"boss also awards one coin without clear bonus");yield return Shot("08-victory");
   game.Save.Value.unlocked=288;game.StartStage(287);Check(game.StageIndex==287,"final mission starts");game.TogglePause();yield return Shot("09-final-mission");
   for(int i=0;i<8;i++){
-   game.StartStage(i);Call("ClearRun");var data=game.catalog.stages[i].boss;Call("SpawnEnemy",data,0f);var actor=pool.Items.First(e=>e.gameObject.activeSelf);Call("FireBoss",actor,data.shotCount,false);
+   game.StartStage(i);Call("ClearRun");var data=game.catalog.stages[i].boss;Call("SpawnEnemy",data,0f);var actor=pool.Items.First(e=>e.gameObject.activeSelf);Call("FireBoss",actor,data.shotCount);
    Check(Field<EntityPool>("bullets").Items.Any(e=>e.gameObject.activeSelf&&e.kind==EntityKind.EnemyBullet),"boss pattern "+data.pattern+" fires valid projectiles");
   }
-  game.StartStage(0);Call("ClearRun");Call("SpawnEnemy",game.catalog.stages[0].boss,0f);var livingBoss=pool.Items.First(e=>e.gameObject.activeSelf);float health=livingBoss.hp;int charges=game.Bombs;game.Bomb();Check(game.Bombs==charges-1&&game.NukesUsed==1,"Nuke consumes one existing charge");Check(Mathf.Approximately(livingBoss.hp,health-game.catalog.balance.bombDamage),"Nuke damage unchanged");
+  game.StartStage(0);Call("ClearRun");Call("SpawnEnemy",game.catalog.stages[0].boss,0f);var livingBoss=pool.Items.First(e=>e.gameObject.activeSelf);int charges=game.Bombs;game.ActivateRayGun();Check(game.Bombs==charges-1&&game.RayGunsUsed==1,"Ray gun consumes one charge");float rayHp=livingBoss.hp;Call("TickRay",.5f);Check(livingBoss.hp<rayHp,"Ray beam melts the boss in its lane");Call("EndRay");
   livingBoss.Position=new Vector2(0,livingBoss.enemy.holdY);livingBoss.hp=livingBoss.maxHp*.65f;Call("TickEnemies",.01f);
   Check(livingBoss.bossStage==2&&game.BossTransition,"70 percent triggers phase tell");
   Check(!Field<EntityPool>("bullets").Items.Any(e=>e.gameObject.activeSelf&&e.kind==EntityKind.EnemyBullet),"phase transition clears hostile bullets");
   livingBoss.hp=livingBoss.maxHp*.35f;Call("TickEnemies",.01f);Check(livingBoss.bossStage==3&&game.BossTransition,"40 percent triggers final phase tell");
   livingBoss.phaseTell=0;livingBoss.shotTimer=0;Call("TickEnemies",.01f);Check(Field<EntityPool>("bullets").Items.Any(e=>e.gameObject.activeSelf&&e.kind==EntityKind.EnemyBullet),"final phase resumes fire after warning");
+  livingBoss.beamTimer=0;livingBoss.beamTell=livingBoss.beamActive=0;Call("TickEnemies",.01f);Check(game.BossBeamTelegraph,"boss beam locks a lane before firing");Check(Mathf.Approximately(livingBoss.beamTellMax,game.catalog.balance.bossBeamTelegraph),"beam telegraph records its own duration");
+  Call("TickEnemies",2f);Check(game.BossBeamActive,"boss beam fires after its telegraph");
+  livingBoss.bossStage=1;livingBoss.hp=livingBoss.maxHp*.65f;Call("TickEnemies",.01f);Check(livingBoss.bossStage==1,"phase change waits for the beam to finish");
+  livingBoss.fightTime=game.catalog.balance.bossEnrageSeconds;Check(game.BossEnraged,"boss enrages on the soft timer");
   game.ShowMenu();game.View.Worlds();yield return Shot("10-worlds");game.View.Fleet();yield return Shot("11-fleet");game.View.Settings();yield return Shot("12-settings");
-  game.StartStage(0);Call("ClearRun");Call("SpawnEnemy",game.catalog.stages[0].waves[0].enemy,0f);var victim=pool.Items.First(e=>e.gameObject.activeSelf);victim.Position=new Vector2(0,1);Call("KillEnemy",victim);yield return Shot("13-explosion",.065f);game.Bomb();yield return Shot("14-nuke",.065f);
+  game.StartStage(0);Call("ClearRun");Call("SpawnEnemy",game.catalog.stages[0].waves[0].enemy,0f);var victim=pool.Items.First(e=>e.gameObject.activeSelf);victim.Position=new Vector2(0,1);Call("KillEnemy",victim);yield return Shot("13-explosion",.065f);game.ActivateRayGun();yield return Shot("14-raygun",.065f);
   game.StartStage(4);Call("ClearRun");typeof(GameController).GetField("weaponTier",BindingFlags.Instance|BindingFlags.NonPublic).SetValue(game,5);typeof(GameController).GetField("weaponTimer",BindingFlags.Instance|BindingFlags.NonPublic).SetValue(game,10f);
   var roster=game.catalog.stages.SelectMany(s=>s.waves).Select(w=>w.enemy).Distinct().Take(3).ToArray();for(int i=0;i<roster.Length;i++){Call("SpawnEnemy",roster[i],i*2-2f);pool.Items.Last(e=>e.gameObject.activeSelf).Position=new Vector2(i*2-2,3);}
   yield return Shot("15-roster",.5f);
+  // New Game+: win the final mission, enter NG+, verify scaling on the next run.
+  game.StartStage(287);Call("ClearRun");Call("SpawnEnemy",game.catalog.stages[287].boss,0f);var ngBoss=pool.Items.First(e=>e.gameObject.activeSelf);Call("KillEnemy",ngBoss);
+  Check(game.Won,"final mission crowns the campaign");
+  yield return Shot("16-campaign-complete");
+  int ngBefore=game.Save.Value.ngPlus;game.EnterNgPlus();Check(game.Save.Value.ngPlus==ngBefore+1,"NG+ increments on entering");Check(game.State==GameState.Menu,"NG+ returns to command deck");
+  game.StartStage(0);Check(Mathf.Approximately(Field<float>("ngScale"),1f+.25f*game.Save.Value.ngPlus),"NG+ scales encounter difficulty");
+  yield return Shot("17-ngplus");
  }
  IEnumerator Backgrounds(){
   yield return new WaitForSecondsRealtime(1);game=FindObjectOfType<GameController>();

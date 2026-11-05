@@ -27,6 +27,8 @@ MonoBehaviour:
   - {fileID: -7393907808661035585, guid: e095d32aba1035e4a948451bc6400ad1, type: 3}
   - {fileID: -3636167436116684765, guid: e095d32aba1035e4a948451bc6400ad1, type: 3}
   pulse: {fileID: 21300000, guid: ab16544ef7af4a547af9230139751a63, type: 3}
+  rayCore: {fileID: 21300000, guid: b7cfaee3a480483a9e1ded43114c5e44, type: 3}
+  rayCap: {fileID: 21300000, guid: ab9e100b343c4a7686fb5bbcb931735d, type: 3}
   hostileOrb: {fileID: 21300000, guid: cb96cdaa8f8eccd4ba85e6e23d7de3d4, type: 3}
   flame: {fileID: 21300000, guid: 01fb9fa49a6e11b4caa76253acc63b4c, type: 3}
   blast: {fileID: 21300000, guid: 00e35e9f4facdaf4fadf852b8374cbae, type: 3}

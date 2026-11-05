@@ -6,13 +6,16 @@ namespace StarBlitz.Services {
  public int version = 1, coins, gems, unlocked = 1;
  public int[] upgrades = new int[5];
  public int[] stars = new int[8];
- public bool sound = true, dragToFire;
+ public bool sound = true;
  public bool sfxMuted;
  public string dailyClaim = "";
  public int bestScore;
  public int selectedShip;
  public bool[] ownedShips = new bool[] {true};
  public bool reducedEffects;
+ // Economy flags: first rewarded ad of the day pays double; NG+ cycles won.
+ public string rewardedBonusDate = "";
+ public int ngPlus;
 }
 /// <summary>Single boundary for local persistence; replace with cloud storage later.</summary>
 public sealed class SaveService {

@@ -11,11 +11,13 @@ public sealed class Entity : MonoBehaviour {
  [HideInInspector] public float hp, maxHp, radius, damage, age, shotTimer, phase, homeX, life;
  [HideInInspector] public int pickup, bossStage, volley;
  [HideInInspector] public float phaseTell;
+ [HideInInspector] public float fightTime, beamTell, beamTellMax, beamActive, beamTimer, specialTimer, specialTell;
+ [HideInInspector] public bool beamHit, bossEntered;
  [HideInInspector] public SpriteRenderer view;
  public Vector2 Position { get => transform.position; set => transform.position = new Vector3(value.x,value.y,0); }
  public void ResetState() {
   if(!view) view=GetComponent<SpriteRenderer>();
-  enemy=null;velocity=Vector2.zero;hp=maxHp=radius=damage=age=shotTimer=phase=homeX=0;life=1;pickup=bossStage=volley=0;phaseTell=0;
+  enemy=null;velocity=Vector2.zero;hp=maxHp=radius=damage=age=shotTimer=phase=homeX=0;life=1;pickup=bossStage=volley=0;phaseTell=0;fightTime=beamTell=beamTellMax=beamActive=beamTimer=specialTimer=specialTell=0;beamHit=bossEntered=false;
   transform.rotation=Quaternion.identity;transform.localScale=Vector3.one;view.color=Color.white;
  }
  public void Visual(Sprite sprite,float size,Color tint,int order) {

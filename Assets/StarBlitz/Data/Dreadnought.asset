@@ -28,7 +28,7 @@ MonoBehaviour:
   sineAmplitude: 2.1
   sineFrequency: 1.3
   score: 2500
-  coins: 65
+  coins: 1
   dropChance: 0.3
   bossPhaseThreshold: 0.5
   bossPhaseFireMultiplier: 0.6

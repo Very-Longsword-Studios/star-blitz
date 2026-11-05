@@ -4,6 +4,7 @@ namespace StarBlitz.Data {
 public sealed class PresentationData : ScriptableObject {
  public Font font;
  public Sprite star, particle, shieldRing;
+ [Tooltip("Long cylindrical particle ray: stretchable core segment and dome cap (flat edge matches the core).")] public Sprite rayCore, rayCap;
  public Sprite nebula;
  [Tooltip("One background per existing 36-mission world. The original nebula is the fallback.")]
  public Sprite[] worldBackgrounds;

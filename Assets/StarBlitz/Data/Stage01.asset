@@ -19,7 +19,7 @@ MonoBehaviour:
   healthScale: 1.0
   speedScale: 1.0
   fireRateScale: 1.0
-  clearCoins: 100
+  clearCoins: 0
   waves:
   - enemy: {fileID: 11400000, guid: a290604e2d60531589c13942075d827c, type: 2}
     count: 7
@@ -53,3 +53,4 @@ MonoBehaviour:
     alternateSides: 0
   boss: {fileID: 11400000, guid: 3bbf0d9838d15dcbb779b60bafb130b7, type: 2}
   bossDelay: 3
+

@@ -11,7 +11,8 @@ public static class ReferenceFeel {
   for(int i=0;i<catalog.stages.Length;i++){
    var boss=catalog.stages[i].boss;
    // Authored durability, independent of player upgrades. Existing world scaling still applies.
-   boss.health=(8500+(i/36)*650)*(1+(i%36)*.007f);
+   boss.health=BossTuning.Health(i,BossTuning.ReferenceDps(catalog.ships[0],i/36),catalog.balance.bossFightSeconds);
+   boss.referenceDps=BossTuning.ReferenceDps(catalog.ships[0],i/36);
    boss.bossPhaseThreshold=.7f;boss.bossPhaseFireMultiplier=.85f;boss.bossPhaseExtraShots=2;
    EditorUtility.SetDirty(boss);
   }

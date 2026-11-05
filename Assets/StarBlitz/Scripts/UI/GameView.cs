@@ -9,9 +9,12 @@ namespace StarBlitz.UI {
 /// <summary>Portrait, safe-area aware flight deck. All controls are standard editable uGUI.</summary>
 public sealed class GameView : MonoBehaviour {
  GameController game;PresentationData theme;RectTransform safe,screen;Canvas canvas;
- Text score,wave,coins,bombCount,status,timer,bossState;Image hull,shield,boss,flash,damageEdge;RectTransform bombControl,pauseControl,hero;
+ Text score,wave,coins,status,timer,bossState,comboLabel;Image hull,shield,boss,flash,damageEdge;RectTransform bombControl,pauseControl,hero;
  float hurtGlow,displayScore;float heroY=390;
  readonly Vector3[] corners=new Vector3[4]; bool hud;string page;Vector2 lastScreen;Rect lastSafe;int stagePage,shipIndex;float opened;
+ AbilityChip rayChip,overdriveChip,shieldChip,magnetChip,multiplierChip;Image[] rayPips;
+ // Ability icons: neon hex-token style sprites with a countdown bar, shown only while the ability is active.
+ sealed class AbilityChip {public GameObject panel,icon,track;public Image fill;public void Set(bool on){if(panel)panel.SetActive(on);if(icon)icon.SetActive(on);if(track)track.SetActive(on);if(fill)fill.gameObject.SetActive(on);}}
  Color Gold=new Color(1,.77f,.32f), Navy=new Color(.025f,.045f,.09f,.94f);
  public void Initialize(GameController controller){
   game=controller;theme=game.catalog.presentation;
@@ -30,10 +33,21 @@ public sealed class GameView : MonoBehaviour {
   if(screen){var group=screen.GetComponent<CanvasGroup>();if(group)group.alpha=Mathf.Clamp01((Time.unscaledTime-opened)*6);}
  }
  Rect ScreenRect(RectTransform r){if(!r)return new Rect();r.GetWorldCorners(corners);return new Rect(corners[0].x,corners[0].y,corners[2].x-corners[0].x,corners[2].y-corners[0].y);}
+ AbilityChip MakeChip(float x,float y,Sprite icon,Color edge){
+  var chip=new AbilityChip();
+  if(!icon)return chip;
+  chip.panel=Decor(DeckGraphic.Shape.Rounded,x,y,48,48,new Color(.05f,.08f,.15f,.92f),edge).gameObject;
+  chip.icon=Sprite(icon,x,y,32,32,Color.white).gameObject;
+  chip.track=Box("Track",x,y+28,38,4,new Color(.14f,.18f,.28f,.95f)).gameObject;
+  chip.fill=Box("Fill",x,y+28,38,4,edge);
+  var r=chip.fill.rectTransform;float left=r.anchoredPosition.x-r.sizeDelta.x*.5f;r.pivot=new Vector2(0,.5f);r.anchoredPosition=new Vector2(left,r.anchoredPosition.y);
+  chip.Set(false);return chip;
+ }
+ void UpdateChip(AbilityChip chip,float left,float duration){if(chip==null||chip.panel==null)return;bool on=left>0f;chip.Set(on);if(on&&chip.fill)SetBar(chip.fill,Mathf.Clamp01(left/Mathf.Max(.01f,duration)),38);}
  RectTransform NewRect(string name,Transform parent){var r=new GameObject(name,typeof(RectTransform),typeof(CanvasRenderer)).GetComponent<RectTransform>();r.SetParent(parent,false);return r;}
  void Position(RectTransform r,float x,float y,float w,float h){r.anchorMin=r.anchorMax=new Vector2(.5f,1);r.pivot=new Vector2(.5f,.5f);r.anchoredPosition=new Vector2(x,-y);r.sizeDelta=new Vector2(w,h);}
  Image Box(string name,float x,float y,float w,float h,Color color){var r=NewRect(name,screen);Position(r,x,y,w,h);var image=r.gameObject.AddComponent<Image>();image.color=color;image.raycastTarget=false;return image;}
- void Panel(float x,float y,float w,float h,Color color){Box("Panel",x,y,w,h,color);Box("Edge",x-w/2+1,y,2,h-14,new Color(.2f,.85f,1,.45f));Box("Corner",x+w/2-13,y-h/2+1,26,2,theme.accent);Box("Corner",x-w/2+13,y+h/2-1,26,2,theme.accent);}
+ void Panel(float x,float y,float w,float h,Color color,bool hide=false){var p=Box("Panel",x,y,w,h,color);var edge=Box("Edge",x-w/2+1,y,2,h-14,new Color(.2f,.85f,1,.45f));var c1=Box("Corner",x+w/2-13,y-h/2+1,26,2,theme.accent);var c2=Box("Corner",x-w/2+13,y+h/2-1,26,2,theme.accent);if(hide){p.gameObject.SetActive(false);edge.gameObject.SetActive(false);c1.gameObject.SetActive(false);c2.gameObject.SetActive(false);}}
  Text Label(string value,float x,float y,float w,float h,int size,Color color,TextAnchor align=TextAnchor.MiddleCenter){var r=NewRect(value,screen);Position(r,x,y,w,h);var t=r.gameObject.AddComponent<Text>();t.font=theme.font;t.text=value;t.fontSize=size;t.color=color;t.alignment=align;t.raycastTarget=false;t.horizontalOverflow=HorizontalWrapMode.Wrap;t.verticalOverflow=VerticalWrapMode.Truncate;return t;}
  Image Sprite(Sprite sprite,float x,float y,float w,float h,Color color){var i=Box("Artwork",x,y,w,h,color);i.sprite=sprite;i.preserveAspect=true;return i;}
  DeckGraphic Decor(DeckGraphic.Shape shape,float x,float y,float w,float h,Color color,Color edge){var r=NewRect(shape.ToString(),screen);Position(r,x,y,w,h);var g=r.gameObject.AddComponent<DeckGraphic>();g.shape=shape;g.color=color;g.edge=edge;g.raycastTarget=false;return g;}
@@ -47,7 +61,7 @@ public sealed class GameView : MonoBehaviour {
  }
  void Reset(string name){
   if(name=="game")game.Audio.SetPaused(false);else if(name=="pause"||name=="confirm")game.Audio.SetPaused(true);else game.Audio.Menu();
-  hud=false;page=name;hero=null;heroY=390;damageEdge=null;bombControl=pauseControl=null;game.InputReader.BombRect=game.InputReader.PauseRect=new Rect();game.InputReader.ResetDrag();
+  hud=false;page=name;hero=null;heroY=390;damageEdge=null;bombControl=pauseControl=null;comboLabel=null;rayChip=overdriveChip=shieldChip=magnetChip=multiplierChip=null;rayPips=null;game.InputReader.BombRect=game.InputReader.PauseRect=new Rect();game.InputReader.ResetDrag();
   if(screen){screen.gameObject.SetActive(false);Destroy(screen.gameObject);}screen=NewRect(name,safe);screen.anchorMin=screen.anchorMax=new Vector2(.5f,.5f);screen.sizeDelta=new Vector2(540,960);screen.anchoredPosition=Vector2.zero;Layout();opened=Time.unscaledTime;screen.gameObject.AddComponent<CanvasGroup>();
   if(name!="game")Box("Atmosphere",0,480,540,960,new Color(.005f,.014f,.035f,.35f));
  }
@@ -89,14 +103,8 @@ public sealed class GameView : MonoBehaviour {
    float labelX=x+(x>0?-134:134);Label(game.catalog.stages[first].sector,labelX,y-8,183,24,11,theme.ink);int earned=0;for(int n=first;n<first+36;n++)earned+=game.Save.Value.stars[n];Label(unlocked?earned+" / 108 STARS":"WORLD "+(w+1)+" LOCKED",labelX,y+14,183,20,10,unlocked?Gold:theme.muted);
   }Back();
  }
- void Popup(string value,Vector2 position,Color color){
-  if(!hud||!screen||screen.GetComponentsInChildren<CombatPopup>().Length>=10)return;
-  Vector2 p;RectTransformUtility.ScreenPointToLocalPointInRectangle(screen,Camera.main.WorldToScreenPoint(position),null,out p);p.x=Mathf.Clamp(p.x,-190,190);p.y=Mathf.Clamp(p.y,-330,300);
-  var t=Label(value,0,0,180,28,13,color);t.rectTransform.anchoredPosition=new Vector2(p.x,p.y-screen.rect.height*.5f);var fx=t.gameObject.AddComponent<CombatPopup>();fx.text=t;fx.reduced=game.Save.Value.reducedEffects;
- }
- public void CoinFeedback(Vector2 position){Popup("+1 COIN",position,Gold);}
- public void DamageFeedback(Vector2 position,int shieldDamage,int hullDamage){hurtGlow=1;if(shieldDamage>0)Popup("SHIELD -"+shieldDamage,position+Vector2.up*.6f,new Color(.7f,.65f,1));if(hullDamage>0)Popup("HULL -"+hullDamage,position+Vector2.up*1.1f,theme.danger);}
- public void PickupFeedback(Vector2 position,int type){string[] names={"WEAPON UP","SHIELD","NUKE PICKUP","WEAPON UP","+GEMS","MAGNET","SCORE BOOST"};Popup(names[Mathf.Clamp(type,0,names.Length-1)],position,theme.accent);}
+ // No floating text ever: hits flash the screen edge instead.
+ public void HitFlash(){hurtGlow=1;}
  public void Fleet(){
   Reset("fleet");var ships=game.catalog.ships;shipIndex=Mathf.Clamp(shipIndex,0,ships.Length-1);var ship=ships[shipIndex];bool owned=game.Save.Value.ownedShips[shipIndex];bool selected=game.Save.Value.selectedShip==shipIndex;
   Top("YOUR FLEET","CHOOSE YOUR FIGHTER  /  "+(shipIndex+1)+" OF "+ships.Length);Wallet();
@@ -108,31 +116,51 @@ public sealed class GameView : MonoBehaviour {
   if(!owned)Label(Mathf.Max(0,ship.unlockCost-game.Save.Value.coins)+" MORE COINS NEEDED  /  1 COIN PER ENEMY",0,848,468,26,11,Gold);Back();
  }
  public void Gameplay(){
-  Reset("game");hud=true;displayScore=game.Score;Panel(0,61,510,107,new Color(.012f,.025f,.06f,.94f));
+  Reset("game");hud=true;displayScore=game.Score;Panel(0,61,510,107,new Color(.012f,.025f,.06f,.94f),true);
   Label("MISSION "+(game.StageIndex+1).ToString("000"),-166,28,170,25,11,theme.accent);score=Label("000000",-165,60,170,38,26,theme.ink);coins=Label("0 C",115,60,133,28,15,Gold);timer=Label("0:00",115,28,110,23,11,theme.muted);
   pauseControl=Button("II",220,45,43,null,false,48).GetComponent<RectTransform>();
-  Box("Hull track",-42,92,378,5,new Color(.15f,.2f,.3f));hull=Box("Hull",-42,92,378,5,theme.accent);Box("Shield track",-42,104,378,3,new Color(.15f,.2f,.3f));shield=Box("Shield",-42,104,378,3,new Color(.55f,.55f,1));
+  // Vitals hidden while we evaluate HUD clutter; bars still exist and update so re-showing is a one-line change.
+  Box("Hull track",-42,92,378,5,new Color(.15f,.2f,.3f)).gameObject.SetActive(false);hull=Box("Hull",-42,92,378,5,theme.accent);hull.gameObject.SetActive(false);Box("Shield track",-42,104,378,3,new Color(.15f,.2f,.3f)).gameObject.SetActive(false);shield=Box("Shield",-42,104,378,3,new Color(.55f,.55f,1));shield.gameObject.SetActive(false);
   wave=Label("",0,143,480,30,13,theme.ink);boss=Box("Boss",0,175,410,8,theme.danger);boss.gameObject.SetActive(false);bossState=Label("",0,199,465,23,11,theme.danger);
   foreach(var bar in new[]{hull,shield,boss}){float left=bar.rectTransform.anchoredPosition.x-bar.rectTransform.sizeDelta.x*.5f;bar.rectTransform.pivot=new Vector2(0,.5f);bar.rectTransform.anchoredPosition=new Vector2(left,bar.rectTransform.anchoredPosition.y);}
-  status=Label("",62,849,305,26,12,theme.accent);var nuke=Button("",-190,875,82,null,false,88);nuke.GetComponent<DeckGraphic>().shape=DeckGraphic.Shape.Disc;nuke.GetComponent<DeckGraphic>().edge=Gold;bombControl=nuke.GetComponent<RectTransform>();Decor(DeckGraphic.Shape.Nuke,-190,862,31,35,Gold,Gold);Label("NUKE",-190,899,80,24,11,Gold);bombCount=Label("",-190,938,150,24,11,theme.muted);
+  var icons=game.catalog.balance.pickupSprites;Color shipNeon=GameController.NeonOf(game.ActiveShip.engineColor);
+  rayChip=MakeChip(232,246,icons!=null&&icons.Length>2?icons[2]:null,shipNeon);if(rayChip.icon)rayChip.icon.GetComponent<Image>().color=shipNeon;
+  overdriveChip=MakeChip(232,308,icons!=null&&icons.Length>0?icons[0]:null,theme.accent);
+  shieldChip=MakeChip(232,370,icons!=null&&icons.Length>1?icons[1]:null,new Color(.72f,.45f,1f));
+  magnetChip=MakeChip(232,432,icons!=null&&icons.Length>5?icons[5]:null,new Color(.36f,.95f,.77f));
+  multiplierChip=MakeChip(232,494,icons!=null&&icons.Length>6?icons[6]:null,Gold);
+  status=Label("",62,849,305,26,12,theme.accent);comboLabel=Label("",62,823,305,20,12,Gold);comboLabel.gameObject.SetActive(false);var ray=Button("",-190,875,82,null,false,88);ray.GetComponent<DeckGraphic>().shape=DeckGraphic.Shape.Disc;ray.GetComponent<DeckGraphic>().edge=shipNeon;bombControl=ray.GetComponent<RectTransform>();Decor(DeckGraphic.Shape.Beam,-190,862,34,36,Color.Lerp(shipNeon,Color.black,.55f),shipNeon);rayPips=new Image[9];for(int i=0;i<9;i++){rayPips[i]=Sprite(icons!=null&&icons.Length>2?icons[2]:null,-258+i*17,936,15,15,shipNeon);rayPips[i].gameObject.SetActive(i<game.Bombs);}
   Label("DRAG TO MOVE\nAUTO FIRE ONLINE",62,895,305,52,11,theme.muted);flash=Box("Flash",0,480,540,960,new Color(.5f,.9f,1,0));damageEdge=Box("Damage warning",0,122,510,3,Color.clear);TickHud(0);Canvas.ForceUpdateCanvases();game.InputReader.BombRect=ScreenRect(bombControl);game.InputReader.PauseRect=ScreenRect(pauseControl);
  }
+ string BossStateText(){
+  string s="PHASE "+game.BossPhase+"  /  "+Mathf.CeilToInt(game.BossFraction*100)+"%";
+  if(game.BossBeamActive)return s+"  /  BEAM";
+  if(game.BossBeamTelegraph)return s+"  /  BEAM LOCK";
+  if(game.BossSpecialTelegraph)return s+"  /  "+game.BossSpecialName;
+  if(game.BossEnraged)return s+"  /  ENRAGED";
+  if(game.BossTransition)return s+"  /  GET READY";
+  if(game.BossCharge>.25f)return s+"  /  WEAPONS CHARGING";
+  return s;
+ }
  void SetBar(Image bar,float fraction,float width){bar.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal,width*Mathf.Clamp01(fraction));}
- public void TickHud(float amount){if(!hud)return;displayScore=Mathf.MoveTowards(displayScore,game.Score,Mathf.Max(40,(game.Score-displayScore)*14)*Time.deltaTime);score.text=Mathf.RoundToInt(displayScore).ToString("000000");coins.text=game.RunCoins+" COINS";wave.text=game.BossFraction>0?game.BossName:game.WaveLabel;bombCount.text=game.Bombs+" CHARGES";timer.text=((int)game.Elapsed/60)+":"+((int)game.Elapsed%60).ToString("00");SetBar(hull,game.Hull/game.ActiveShip.hull,378);SetBar(shield,game.Shield/game.MaxShield,378);boss.gameObject.SetActive(game.BossFraction>0);SetBar(boss,game.BossFraction,410);bossState.text=game.BossFraction>0?"PHASE "+game.BossPhase+"  /  "+Mathf.CeilToInt(game.BossFraction*100)+"%"+(game.BossTransition?"  /  GET READY":game.BossCharge>.25f?"  Ãƒâ€šÃ‚Â·  WEAPONS CHARGING":""):"";status.text=game.PowerStatus;flash.color=new Color(.5f,.9f,1,game.Save.Value.reducedEffects?0:amount*.25f);}
+ public void TickHud(float amount){if(!hud)return;displayScore=Mathf.MoveTowards(displayScore,game.Score,Mathf.Max(40,(game.Score-displayScore)*14)*Time.deltaTime);score.text=Mathf.RoundToInt(displayScore).ToString("000000");coins.text=game.RunCoins+" COINS";wave.text=game.BossFraction>0?game.BossName:game.WaveLabel;timer.text=((int)game.Elapsed/60)+":"+((int)game.Elapsed%60).ToString("00");SetBar(hull,game.Hull/game.ActiveShip.hull,378);SetBar(shield,game.Shield/game.MaxShield,378);boss.gameObject.SetActive(game.BossFraction>0);SetBar(boss,game.BossFraction,410);boss.color=game.BossEnraged?new Color(1,.12f,.2f):theme.danger;bossState.text=game.BossFraction>0?BossStateText():"";status.text=game.PowerStatus;if(comboLabel){bool show=game.Combo>1;if(comboLabel.gameObject.activeSelf!=show)comboLabel.gameObject.SetActive(show);if(show)comboLabel.text=game.ComboStatus;}if(rayChip!=null){UpdateChip(rayChip,game.RayTimeLeft,game.catalog.balance.rayDuration);UpdateChip(overdriveChip,game.OverdriveTimeLeft,game.catalog.balance.weaponDuration);UpdateChip(shieldChip,game.ShieldTimeLeft,game.catalog.balance.shieldDuration);UpdateChip(magnetChip,game.MagnetTimeLeft,game.catalog.balance.magnetDuration);UpdateChip(multiplierChip,game.MultiplierTimeLeft,game.catalog.balance.multiplierDuration);}if(rayPips!=null)for(int i=0;i<rayPips.Length;i++)rayPips[i].gameObject.SetActive(i<game.Bombs);flash.color=new Color(.5f,.9f,1,game.Save.Value.reducedEffects?0:amount*.25f);}
  public void Pause(){Reset("pause");Box("Dim",0,480,540,960,new Color(.005f,.012f,.035f,.88f));Top("FLIGHT PAUSED","TAKE A BREATH, PILOT.");Panel(0,335,468,142,Navy);Label("MISSION "+(game.StageIndex+1).ToString("000"),0,305,430,30,16,theme.accent);Label(game.RunCoins+" COINS  /  "+game.Score+" POINTS",0,357,430,34,21,theme.ink);Button("RESUME FLIGHT",0,491,468,game.TogglePause,true,68);Button("RESTART MISSION",0,579,468,()=>ConfirmLeave(true));Button("COMMAND DECK",0,657,468,()=>ConfirmLeave(false));Label("Auto-fire resumes when you return.",0,736,460,30,13,theme.muted);}
  void ConfirmLeave(bool restart){Reset("confirm");Top(restart?"RESTART MISSION?":"LEAVE THIS RUN?","UNBANKED RUN COINS WILL BE LOST.");Button(restart?"RESTART":"LEAVE",0,435,460,()=>{if(restart)game.StartStage(game.StageIndex);else game.ShowMenu();},true);Button("KEEP PLAYING",0,519,460,game.TogglePause);}
  public void Results(){
   Reset("results");Box("Dim",0,480,540,960,new Color(.005f,.01f,.03f,.65f));Top(game.Won?"MISSION COMPLETE":"SIGNAL LOST",game.catalog.stages[game.StageIndex].title);
   Label(game.Won?new string('\u2605',game.Stars)+new string('\u2606',3-game.Stars):"REARM. RETURN.",0,282,460,90,game.Won?54:28,Gold);Label(game.Score.ToString("N0"),0,392,460,80,58,theme.ink);Label("TOTAL SCORE",0,449,460,25,12,theme.muted);
-  Panel(0,547,468,146,Navy);Label("+"+game.RunCoins+" COINS BANKED",0,508,440,37,25,Gold);Label("GEMS EARNED   +"+game.RunGems,0,547,430,25,13,new Color(.8f,.65f,1));Label("NUKES USED   "+game.NukesUsed+"     /     COINS SPENT   0",0,580,440,25,12,theme.muted);Label("ONE DESTROYED ENEMY = ONE COIN",0,607,440,20,10,theme.muted);
-  int next=game.Won?game.StageIndex+1:game.StageIndex;Button(next>=game.catalog.stages.Length?"CAMPAIGN COMPLETE":game.Won?"NEXT MISSION   >":"RETRY MISSION",0,673,468,()=>{if(next>=game.catalog.stages.Length)StageSelect();else game.StartStage(next);},true,68);Button("FLEET",-121,756,226,()=>{shipIndex=game.Save.Value.selectedShip;Fleet();});Button("UPGRADES",121,756,226,Hangar);Back();
+  Panel(0,547,468,146,Navy);Label("+"+game.RunCoins+" COINS BANKED",0,508,440,37,25,Gold);Label("GEMS EARNED   +"+game.RunGems,0,547,430,25,13,new Color(.8f,.65f,1));Label("RAY GUNS USED   "+game.RayGunsUsed+"     /     BEST   "+game.Save.Value.bestScore.ToString("N0"),0,580,440,25,12,theme.muted);Label("ONE DESTROYED ENEMY = ONE COIN",0,607,440,20,10,theme.muted);
+  int next=game.Won?game.StageIndex+1:game.StageIndex;if(next>=game.catalog.stages.Length){Button("ENTER  NG+  (+25%)",-121,673,226,game.EnterNgPlus,true,68);Button("CAMPAIGN MAP",121,673,226,StageSelect,false,68);}else Button(game.Won?"NEXT MISSION   >":"RETRY MISSION",0,673,468,()=>game.StartStage(next),true,68);Button("FLEET",-121,756,226,()=>{shipIndex=game.Save.Value.selectedShip;Fleet();});Button("UPGRADES",121,756,226,Hangar);string adLabel=game.RewardClaimed?"COINS BOOSTED":game.FirstRewardedAdToday?"WATCH AD  /  DOUBLE COINS":"WATCH AD  /  +50% COINS";var adBtn=Button(adLabel,0,824,468,game.DoubleReward,false,52);adBtn.interactable=!game.RewardClaimed&&game.Ads!=null&&game.Ads.RewardReady;Back();
  }
  public void Hangar(){
-  Reset("hangar");Top("ENGINEERING",game.ActiveShip.displayName+"  /  FLEET-WIDE UPGRADES");Wallet();string[] names={"WEAPON DAMAGE","FIRE RATE","THRUST","SHIELD CAPACITY","NUKE PAYLOAD"};string[] units={"Harder hits","Faster automatic fire","Keyboard flight speed","More shield protection","Extra starting charges"};
+  Reset("hangar");Top("ENGINEERING",game.ActiveShip.displayName+"  /  FLEET-WIDE UPGRADES");Wallet();string[] names={"WEAPON DAMAGE","FIRE RATE","THRUST","SHIELD CAPACITY","RAY GUN CAPACITY"};string[] units={"Harder hits","Faster automatic fire","Keyboard flight speed","More shield protection","Extra starting charges"};
   for(int i=0;i<5;i++){int n=i,level=game.Save.Value.upgrades[i],cost=game.catalog.balance.UpgradeCost(level);bool max=level>=game.catalog.balance.upgradeMaxLevel;float y=291+i*104;Panel(0,y,468,90,Navy);Label(names[i]+"  /  "+level,-75,y-17,288,29,15,theme.ink,TextAnchor.MiddleLeft);Label(units[i],-75,y+17,288,25,12,theme.muted,TextAnchor.MiddleLeft);var b=Button(max?"MAX":cost+" C",161,y,124,()=>{game.Upgrade(n);Hangar();},true,53);b.interactable=!max&&game.Save.Value.coins>=cost;}
-  Label("Applies to all owned fighters on the next mission.",0,811,468,35,12,theme.muted);Back();
+  Label("Exchange shop gems for coins.",0,766,468,22,11,theme.muted);
+  var exBtn=Button("EXCHANGE  /  "+game.catalog.balance.gemExchangeCost+" GEMS  >  "+game.catalog.balance.gemExchangeCoins+" COINS",0,818,468,()=>{if(game.Save.Value.gems>=game.catalog.balance.gemExchangeCost){game.Save.Value.gems-=game.catalog.balance.gemExchangeCost;game.Save.Value.coins+=game.catalog.balance.gemExchangeCoins;game.Save.Write();game.Audio.Play(theme.click);}Hangar();},true,50);exBtn.interactable=game.Save.Value.gems>=game.catalog.balance.gemExchangeCost;
+  Back();
  }
- public void Settings(){Reset("settings");Top("FLIGHT SETTINGS","BUILT FOR ONE-FINGER FLIGHT.");Button("MUSIC  /  "+(game.Save.Value.sound?"ON":"OFF"),0,295,468,()=>{game.Save.Value.sound=!game.Save.Value.sound;game.Save.Write();game.Audio.SetEnabled(game.Save.Value.sound);Settings();});Button("SFX  /  "+(!game.Save.Value.sfxMuted?"ON":"OFF"),0,373,468,()=>{game.Save.Value.sfxMuted=!game.Save.Value.sfxMuted;game.Save.Write();game.Audio.SetEffectsEnabled(!game.Save.Value.sfxMuted);Settings();});Button("SCREEN EFFECTS  /  "+(game.Save.Value.reducedEffects?"REDUCED":"FULL"),0,451,468,()=>{game.Save.Value.reducedEffects=!game.Save.Value.reducedEffects;game.Save.Write();Settings();});Panel(0,675,468,280,Navy);Label("AUTO FIRE IS ALWAYS ON",0,563,440,34,18,theme.accent);Label("Drag anywhere on the playfield to fly.\nLift and reposition your finger without moving the ship.\n\nCollect falling power-ups to boost your weapons.\nTap NUKE to clear enemy bullets.\n\nDesktop: drag or WASD / arrows.\nB = Nuke     Esc = pause",0,691,431,227,15,theme.ink);if(game.Ads.PrivacyOptionsRequired)Button("PRIVACY OPTIONS",0,840,468,()=>game.Ads.ShowPrivacyOptions(),false,46);Back();}
+ public void Settings(){Reset("settings");Top("FLIGHT SETTINGS","BUILT FOR ONE-FINGER FLIGHT.");Button("MUSIC  /  "+(game.Save.Value.sound?"ON":"OFF"),0,295,468,()=>{game.Save.Value.sound=!game.Save.Value.sound;game.Save.Write();game.Audio.SetEnabled(game.Save.Value.sound);Settings();});Button("SFX  /  "+(!game.Save.Value.sfxMuted?"ON":"OFF"),0,373,468,()=>{game.Save.Value.sfxMuted=!game.Save.Value.sfxMuted;game.Save.Write();game.Audio.SetEffectsEnabled(!game.Save.Value.sfxMuted);Settings();});Button("SCREEN EFFECTS  /  "+(game.Save.Value.reducedEffects?"REDUCED":"FULL"),0,451,468,()=>{game.Save.Value.reducedEffects=!game.Save.Value.reducedEffects;game.Save.Write();Settings();});
+  bool canClaim=game.Save.CanClaimDaily;var dailyBtn=Button(canClaim?"DAILY CACHE  /  +"+game.catalog.balance.dailyCoins+" COINS  +"+game.catalog.balance.dailyGems+" GEM":"DAILY CACHE  /  CLAIMED",0,529,468,()=>{game.Save.ClaimDaily(game.catalog.balance.dailyCoins,game.catalog.balance.dailyGems);Settings();},canClaim,58);dailyBtn.interactable=canClaim;Panel(0,738,468,150,Navy);Label("AUTO FIRE IS ALWAYS ON",0,677,440,30,17,theme.accent);Label("Drag anywhere on the playfield to fly.\nLift and reposition your finger without moving the ship.\n\nCollect falling power-ups to boost your weapons.\nTap RAY GUN to fire the particle ray.\n\nDesktop: drag or WASD / arrows.\nB = Ray Gun     Esc = pause",0,750,431,118,13,theme.ink);if(game.Ads.PrivacyOptionsRequired)Button("PRIVACY OPTIONS",0,845,468,()=>game.Ads.ShowPrivacyOptions(),false,44);Back();}
  }
 }
 

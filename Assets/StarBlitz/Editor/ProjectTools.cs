@@ -28,14 +28,15 @@ public static class ProjectTools {
    if(c.balance.dropWeights.Length!=7||c.balance.pickupSprites.Length!=7)result.Add("Expected 7 pickup weights/sprites");
    foreach(var sprite in c.balance.pickupSprites)if(!sprite)result.Add("Pickup sprite missing");
    if(c.balance.bulletPool<1||c.balance.enemyPool<1||c.balance.particlePool<1||c.balance.pickupPool<1)result.Add("Pool capacity must be positive");
-   if(c.balance.scorePerCoin<1||c.balance.bombFlashDuration<=0)result.Add("Invalid balance divisor");
+   if(c.balance.bombFlashDuration<=0)result.Add("Invalid balance constant");
+   if(c.balance.bossWeaponTier<1||c.balance.bossBulletDamage<=0||c.balance.bossBeamDamage<=0||c.balance.bossEnrageSeconds<=0)result.Add("Invalid boss balance constant");
   }
   if(!c.presentation||!c.presentation.font||!c.presentation.star||!c.presentation.particle||!c.presentation.shieldRing)result.Add("Presentation reference missing");
-  if(c.presentation){if(!c.presentation.fire||!c.presentation.pickup||!c.presentation.bomb||!c.presentation.explosion||!c.presentation.victory)result.Add("SFX reference missing");if(c.presentation.music.Length==0)result.Add("No music");foreach(var music in c.presentation.music)if(!music)result.Add("Missing music clip");}
+  if(c.presentation){if(!c.presentation.rayCore||!c.presentation.rayCap)result.Add("Beam art reference missing");if(!c.presentation.fire||!c.presentation.pickup||!c.presentation.bomb||!c.presentation.explosion||!c.presentation.victory)result.Add("SFX reference missing");if(c.presentation.music.Length==0)result.Add("No music");foreach(var music in c.presentation.music)if(!music)result.Add("Missing music clip");}
   if(!c.ads)result.Add("Ads configuration missing");
-  if(c.stages==null||c.stages.Length==0)result.Add("No stages");else foreach(var stage in c.stages){
+  if(c.stages==null||c.stages.Length==0)result.Add("No stages");else for(int i=0;i<c.stages.Length;i++){var stage=c.stages[i];
    if(!stage){result.Add("Missing stage reference");continue;}
-   if(!stage.boss||stage.boss.flight!=Flight.Boss)result.Add(stage.name+": missing boss");else CheckEnemy(stage.boss,result);
+   if(!stage.boss||stage.boss.flight!=Flight.Boss)result.Add(stage.name+": missing boss");else{CheckEnemy(stage.boss,result);float seconds=BossTuning.FightLength(stage.boss.health,BossTuning.ReferenceDps(c.ships!=null&&c.ships.Length>0?c.ships[0]:c.ship,i/36));if(seconds<25f||seconds>60f)result.Add(stage.name+": boss lasts "+seconds.ToString("0")+"s at reference gear");}
    if(stage.healthScale<=0||stage.fireRateScale<=0||stage.speedScale<=0)result.Add(stage.name+": invalid difficulty scaling");
    if(stage.waves==null||stage.waves.Length==0)result.Add(stage.name+": no waves");else foreach(var w in stage.waves){if(w.enemy)CheckEnemy(w.enemy,result);else result.Add(stage.name+": null wave enemy");if(w.count<1||w.spawnInterval<=0)result.Add(stage.name+": invalid wave");}
   }

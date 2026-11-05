@@ -18,10 +18,24 @@ public class PolishTests {
   try{var d=host.AddComponent<StarBlitz.Audio.AudioDirector>();d.Initialize(data,true);d.SetEnabled(false);var sources=host.GetComponents<UnityEngine.AudioSource>();Assert.IsTrue(sources[0].mute);Assert.IsFalse(sources[1].mute);d.SetEffectsEnabled(false);d.SetEnabled(true);Assert.IsFalse(sources[0].mute);Assert.IsTrue(sources[1].mute);}
   finally{UnityEngine.Object.DestroyImmediate(host);UnityEngine.Object.DestroyImmediate(data);}
  }
- [Test] public void BossDurabilitySurvivesSustainedFiveLaneFire(){
+ [Test] public void BossFightsLastAboutFortySecondsAtReferenceGear(){
   var c=AssetDatabase.LoadAssetAtPath<GameCatalog>("Assets/StarBlitz/Data/GameCatalog.asset");
-  float dps=c.ships[0].weapon.damage*5/c.ships[0].weapon.interval;
-  Assert.Greater(c.stages[0].boss.health*c.stages[0].healthScale/dps,25f);
+  float dps=BossTuning.ReferenceDps(c.ships[0],0);
+  float seconds=c.stages[0].boss.health/dps;
+  Assert.Greater(seconds,30f);
+  Assert.Less(seconds,45f);
+ }
+ [Test] public void BossFightsNormaliseEveryShipAtReferenceGear(){
+  var c=AssetDatabase.LoadAssetAtPath<GameCatalog>("Assets/StarBlitz/Data/GameCatalog.asset");
+  for(int world=0;world<8;world++){
+   var boss=c.stages[world*36].boss;
+   float authoredDps=boss.referenceDps>0f?boss.referenceDps:BossTuning.ReferenceDps(c.ships[0],world);
+   foreach(var ship in c.ships){
+    float seconds=BossTuning.HealthForShip(boss.health,authoredDps,ship,world)/BossTuning.ReferenceDps(ship,world);
+    Assert.Greater(seconds,35f,ship.displayName+" in world "+(world+1));
+    Assert.Less(seconds,41f,ship.displayName+" in world "+(world+1));
+   }
+  }
  }
  [Test] public void MenuAndGameplayUseDistinctMusic(){
   var data=AssetDatabase.LoadAssetAtPath<PresentationData>("Assets/StarBlitz/Data/Presentation.asset");

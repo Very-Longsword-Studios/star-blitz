@@ -18,7 +18,6 @@ public sealed class StageData : ScriptableObject {
  [Min(0)] public int clearCoins = 100;
  public Wave[] waves;
  public EnemyData boss;
- public float targetSeconds = 150;
  [Min(0)] public float bossDelay = 3;
 }
 }
