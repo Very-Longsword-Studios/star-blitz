@@ -54,7 +54,8 @@ public sealed class GameController : MonoBehaviour {
  public float ComboBonus => 1f+Mathf.Min(Combo,balance.comboMax)*balance.comboScoreBonus;
  public string ComboStatus => Combo>1?"COMBO "+Combo+"  (+"+Mathf.RoundToInt((ComboBonus-1)*100)+"%)":"";
  EntityPool enemies,bullets,pickups,particles,stars;
- Entity player,ring;Camera cam;
+ Entity player;GameObject shieldBubble;SpriteRenderer shieldGlow;SpriteRenderer[] shieldRings,shieldMotes;Camera cam;
+ float shieldAge,shieldFlash,shieldRipple;
  StageData stage;BalanceData balance;PresentationData art;
  float fireTimer,hitTimer,regenTimer,weaponTimer,bubbleTimer,magnetTimer,multiplierTimer,spawnTimer,shakeTimer,flashTimer,comboTimer,rayTimer,rayParticleAccumulator,rayCrackleTimer;
  float ngScale = 1f; // New Game+ difficulty multiplier (1 + 25% per cleared cycle).
@@ -82,7 +83,7 @@ public sealed class GameController : MonoBehaviour {
   particles=new EntityPool("Particles",balance.particlePool,catalog.entityPrefab,transform);
   stars=new EntityPool("Starfield",balance.starCount,catalog.entityPrefab,transform);
   player=Instantiate(catalog.entityPrefab,transform).GetComponent<Entity>();player.ResetState();player.Visual(ActiveShip.sprite,ActiveShip.visualSize,Color.white,10);
-  ring=Instantiate(catalog.entityPrefab,transform).GetComponent<Entity>();ring.ResetState();ring.Visual(art.shieldRing,ActiveShip.visualSize*1.65f,art.accent,9);ring.gameObject.SetActive(false);
+  BuildShieldBubble();
   foreach(var e in stars.Items){e.ResetState();e.gameObject.SetActive(true);e.kind=EntityKind.Star;e.Position=new Vector2(Random.Range(-balance.halfWidth,balance.halfWidth),Random.Range(-balance.halfHeight,balance.halfHeight));e.phase=Random.Range(.3f,1.5f);e.Visual(art.star,.02f+e.phase*.035f,new Color(.45f,.66f,.85f,e.phase*.45f),-20);}
   View=gameObject.AddComponent<GameView>();View.Initialize(this);ShowMenu();
  }
@@ -90,7 +91,7 @@ public sealed class GameController : MonoBehaviour {
  public void ShowMenu(){
   State=GameState.Menu;ClearRun();backdrop.SetWorld((Save.Value.unlocked-1)/36);cam.backgroundColor=catalog.stages[0].background;player.gameObject.SetActive(false);View.MainMenu();
  }
- void ClearRun(){enemies.Clear();bullets.Clear();pickups.Clear();particles.Clear();ring.gameObject.SetActive(false);shakeTimer=0;flashTimer=0;comboTimer=0;Combo=0;EndRay();DestroyBossBeam();bossEntity=null;cam.transform.position=cameraOrigin;}
+ void ClearRun(){enemies.Clear();bullets.Clear();pickups.Clear();particles.Clear();if(shieldBubble)shieldBubble.SetActive(false);shakeTimer=0;flashTimer=0;comboTimer=0;Combo=0;EndRay();DestroyBossBeam();bossEntity=null;cam.transform.position=cameraOrigin;}
  public void StartStage(int index){
   if(index<0||index>=catalog.stages.Length||index>=Save.Value.unlocked)return;
   ngScale=1f+Save.Value.ngPlus*.25f;
@@ -124,7 +125,7 @@ public sealed class GameController : MonoBehaviour {
   TickWaves(dt);TickEnemies(dt);if(State!=GameState.Playing)return;
   TickBullets(dt);if(State!=GameState.Playing)return;
   TickPickups(dt);TickParticles(dt);
-  ring.gameObject.SetActive(bubbleTimer>0);ring.Position=player.Position;
+  TickShield(dt);
   player.view.color=hitTimer>0?new Color(1,1,1,.4f+Mathf.PingPong(Time.time*12,.6f)):Color.white;
   shakeTimer-=dt;flashTimer-=dt;
   cam.transform.position=cameraOrigin+(shakeTimer>0&&!Save.Value.reducedEffects?(Vector3)(Random.insideUnitCircle*balance.shakeStrength):Vector3.zero);
@@ -438,12 +439,66 @@ public sealed class GameController : MonoBehaviour {
   if(Save.Value.reducedEffects)return;
   for(int i=0;i<2;i++){var e=particles.Take();if(!e)return;e.kind=EntityKind.Particle;e.Position=player.Position+new Vector2(i==0?-.19f:.19f,-.48f);e.velocity=new Vector2(Random.Range(-.08f,.08f),-2.5f);e.life=.18f;e.Visual(art.flame?art.flame:art.particle,.32f,ActiveShip.engineColor,9);}
  }
+ // Shield pickup bubble: a soft cyan body, a thick stacked rim and orbiting motes, with a pop-in,
+ // breathing pulse, expiry warning and a flash whenever it soaks a hit.
+ void BuildShieldBubble(){
+  shieldBubble=new GameObject("Shield Bubble");shieldBubble.transform.SetParent(transform,false);
+  shieldGlow=MakeSpritePart(shieldBubble,"Glow",art.particle,art.accent);shieldGlow.sortingOrder=9;
+  shieldRings=new SpriteRenderer[6];
+  for(int i=0;i<shieldRings.Length;i++){shieldRings[i]=MakeSpritePart(shieldBubble,"Ring "+(i+1),art.shieldRing,art.accent);shieldRings[i].sortingOrder=9;}
+  shieldMotes=new SpriteRenderer[4];
+  for(int i=0;i<shieldMotes.Length;i++){shieldMotes[i]=MakeSpritePart(shieldBubble,"Mote "+(i+1),art.particle,new Color(.85f,.98f,1));shieldMotes[i].sortingOrder=9;}
+  shieldBubble.SetActive(false);
+ }
+ void SetPartSize(SpriteRenderer r,float world){
+  if(!r||!r.sprite)return;float natural=Mathf.Max(.01f,Mathf.Max(r.sprite.bounds.size.x,r.sprite.bounds.size.y));
+  r.transform.localScale=Vector3.one*(world/natural);
+ }
+ void TickShield(float dt){
+  bool active=bubbleTimer>0;
+  if(shieldBubble.activeSelf!=active){shieldBubble.SetActive(active);if(active){shieldAge=0;shieldFlash=.5f;}else shieldRipple=0;}
+  if(!active)return;
+  shieldAge+=dt;shieldFlash=Mathf.Max(0,shieldFlash-dt*3f);shieldRipple=Mathf.Max(0,shieldRipple-dt);
+  bool calm=Save.Value.reducedEffects;
+  float left=Mathf.Max(0,bubbleTimer),fadeIn=Mathf.Clamp01(shieldAge/.2f),fadeOut=Mathf.Clamp01(left/.55f),fade=Mathf.Min(fadeIn,fadeOut);
+  float pop=1f+(1f-fadeIn)*.18f,breathe=1f+(calm?.012f:.028f)*Mathf.Sin(shieldAge*3.4f);
+  float d=ActiveShip.visualSize*1.78f*pop*breathe*(1f+shieldFlash*.14f);
+  shieldBubble.transform.position=new Vector3(player.Position.x,player.Position.y,0);
+  float alpha=fade*(.82f+(calm?.04f:.12f)*Mathf.Sin(shieldAge*4.2f));
+  if(left<1.1f&&!calm)alpha*=.5f+.5f*Mathf.Abs(Mathf.Sin(left*20f));
+  alpha=Mathf.Clamp01(alpha+shieldFlash*.45f);
+  SetPartSize(shieldGlow,d*.98f);
+  shieldGlow.color=new Color(art.accent.r,art.accent.g,art.accent.b,fade*(.09f+(calm?.01f:.03f)*Mathf.Sin(shieldAge*4.2f))+shieldFlash*.1f);
+  for(int i=0;i<shieldRings.Length;i++){
+   float t=i/(float)(shieldRings.Length-1);
+   SetPartSize(shieldRings[i],d*(1f-i*.04f));
+   Color rim=Color.Lerp(art.accent,Color.white,.12f+.5f*t);rim.a=alpha*(.46f-.04f*i);shieldRings[i].color=rim;
+  }
+  for(int i=0;i<shieldMotes.Length;i++){
+   float a=shieldAge*(.9f+i*.16f)*(i%2==0?1f:-1f)+i*Mathf.PI*.5f,radius=d*.47f;
+   shieldMotes[i].transform.localPosition=new Vector3(Mathf.Cos(a)*radius,Mathf.Sin(a)*radius,0);
+   SetPartSize(shieldMotes[i],d*.075f);
+   shieldMotes[i].color=new Color(.85f,.98f,1,Mathf.Clamp01(fade*(.35f+.25f*Mathf.Sin(shieldAge*5f+i*1.7f))+shieldFlash*.4f));
+  }
+ }
+ void ShieldActivate(){
+  shieldAge=0;shieldFlash=.8f;
+  var e=particles.Take();if(e){e.kind=EntityKind.Particle;e.Position=player.Position;e.life=.34f;e.pickup=1;e.Visual(art.shieldRing,ActiveShip.visualSize*1.1f,art.accent,12);}
+  Burst(player.Position,art.accent,6);
+ }
+ void ShieldBlock(){
+  shieldFlash=1f;
+  if(shieldRipple>0)return;shieldRipple=.18f;
+  Burst(player.Position,art.accent,3);
+  var e=particles.Take();if(e){e.kind=EntityKind.Particle;e.Position=player.Position;e.life=.26f;e.pickup=1;e.Visual(art.shieldRing,.7f,art.accent,12);}
+ }
  public bool SelectShip(int index){
   if(State==GameState.Playing||State==GameState.Paused||catalog.ships==null||index<0||index>=catalog.ships.Length)return false;
   bool ok=Save.SelectOrBuyShip(index,catalog.ships[index].unlockCost);if(ok)Audio.Play(art.pickup);return ok;
  }
  void DamagePlayer(float damage){
-  if(hitTimer>0||bubbleTimer>0||State!=GameState.Playing)return;
+  if(hitTimer>0||State!=GameState.Playing)return;
+  if(bubbleTimer>0){ShieldBlock();return;}
   Combo=0;comboTimer=0;
   hitTimer=balance.hitInvulnerability;regenTimer=ActiveShip.shieldRegenDelay;shakeTimer=balance.shakeDuration;
   float absorbed=Mathf.Min(Shield,damage);Shield-=absorbed;Hull=Mathf.Max(0,Hull-(damage-absorbed));
@@ -476,7 +531,7 @@ public sealed class GameController : MonoBehaviour {
    if(Vector2.Distance(e.Position,player.Position)<balance.collectRadius+e.radius){
     switch(e.pickup){
      case 0:weaponTier=Mathf.Min(ActiveShip.weapon.maximumTier,weaponTier+1);weaponTimer=balance.weaponDuration;break;
-     case 1:bubbleTimer=balance.shieldDuration;Shield=MaxShield;break;
+     case 1:bubbleTimer=balance.shieldDuration;Shield=MaxShield;ShieldActivate();break;
      case 2:Bombs=Mathf.Min(balance.bombCap,Bombs+1);break;
      case 3:weaponTimer=balance.weaponDuration;weaponTier=Mathf.Min(ActiveShip.weapon.maximumTier,weaponTier+1);break;
      case 4:RunGems+=balance.gemPickup;break;
@@ -563,7 +618,7 @@ public sealed class GameController : MonoBehaviour {
   if(won){Save.Value.unlocked=Mathf.Min(catalog.stages.Length,Mathf.Max(Save.Value.unlocked,StageIndex+2));Save.Value.stars[StageIndex]=Mathf.Max(Save.Value.stars[StageIndex],Stars);Audio.Play(art.victory);}
 
   if(won&&Save.Value.ngPlus>0)Save.Value.gems+=balance.ngPlusRewardGems;Save.Value.coins+=RunCoins;Save.Value.gems+=RunGems;Save.Value.bestScore=Mathf.Max(Save.Value.bestScore,Score);Save.Write();
-  bullets.Clear();pickups.Clear();enemies.Clear();player.gameObject.SetActive(false);ring.gameObject.SetActive(false);cam.transform.position=cameraOrigin;View.Results();Ads.RunFinished();
+  bullets.Clear();pickups.Clear();enemies.Clear();player.gameObject.SetActive(false);if(shieldBubble)shieldBubble.SetActive(false);cam.transform.position=cameraOrigin;View.Results();Ads.RunFinished();
  }
  public bool Upgrade(int index){
   if(index<0||index>=5)return false;int level=Save.Value.upgrades[index];int cost=balance.UpgradeCost(level);

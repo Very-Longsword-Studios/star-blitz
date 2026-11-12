@@ -25,7 +25,7 @@ public static class PolishContent {
   catalog.ships=new ShipData[6];
   for(int i=0;i<6;i++){
    var s=Asset<ShipData>(Root+"Data/Fleet/"+names[i]+".asset");s.displayName=names[i];s.role=roles[i];s.description=desc[i];s.unlockCost=costs[i];s.hull=hulls[i];s.shield=shields[i];s.moveSpeed=speeds[i];s.engineColor=colors[i];s.bombs=i==4?3:2;s.sprite=DrawShip(names[i],i,colors[i],false);s.visualSize=1.15f;s.radius=.21f;
-   var w=Asset<WeaponData>(Root+"Data/Fleet/"+names[i]+"Cannon.asset");EditorUtility.CopySerialized(Load<WeaponData>("PlayerCannon"),w);w.damage=damage[i];w.interval=intervals[i];w.maximumTier=5;w.spreadAngle=7;w.visualSize=.4f;w.tint=colors[i];s.weapon=w;EditorUtility.SetDirty(w);EditorUtility.SetDirty(s);catalog.ships[i]=s;
+   var w=Asset<WeaponData>(Root+"Data/Fleet/"+names[i]+"Cannon.asset");EditorUtility.CopySerialized(Load<WeaponData>("PlayerCannon"),w);w.damage=damage[i];w.interval=intervals[i];w.maximumTier=5;w.spreadAngle=7;w.visualSize=.6f;w.tint=colors[i];s.weapon=w;EditorUtility.SetDirty(w);EditorUtility.SetDirty(s);catalog.ships[i]=s;
   }
   catalog.ship=catalog.ships[0];
   string[] worlds={"CYGNUS REACH","JADE EXPANSE","VIOLET RIFT","EMBER BELT","SOLAR FRONT","CRIMSON VEIL","FROZEN HALO","THE DARK CROWN"};
