@@ -4,7 +4,12 @@ namespace StarBlitz.Gameplay {
 public sealed class CosmicBackdrop : MonoBehaviour {
  SpriteRenderer nebula;Camera cameraView;PresentationData presentation;
  GameObject props;SpriteRenderer[] clouds,meteorHeads,meteorTails;Vector2[] cloudVelocity,meteorVelocity;float[] meteorLength;System.Random propRng;
+ int worldIndex;float builtAspect,motionBlend=1f,driftTime;
  public bool ShowStars {get;private set;} = true;
+ /// <summary>0..1 backdrop motion multiplier. Lowered by the reduced-effects setting.</summary>
+ public float MotionScale {get;set;} = 1f;
+ /// <summary>Freezes backdrop motion without moving anything, so pausing matches the frozen starfield.</summary>
+ public bool Paused {get;set;}
  public void Initialize(PresentationData art,Camera camera){
   cameraView=camera;presentation=art;
   var go=new GameObject("World backdrop");go.transform.SetParent(transform,false);nebula=go.AddComponent<SpriteRenderer>();nebula.sortingOrder=-100;nebula.color=new Color(.5f,.55f,.65f,1);SetWorld(0);
@@ -12,20 +17,27 @@ public sealed class CosmicBackdrop : MonoBehaviour {
  public void SetWorld(int index){
   if(!nebula)return;var worlds=presentation.worldBackgrounds;
   nebula.sprite=worlds!=null&&index>=0&&index<worlds.Length&&worlds[index]?worlds[index]:presentation.nebula;
-  ShowStars=index<4;BuildProps(index);
+  ShowStars=index<4;worldIndex=index;builtAspect=cameraView!=null?cameraView.aspect:0f;BuildProps(index);
  }
  void LateUpdate(){
   if(!nebula||!nebula.sprite)return;
   float scale=Mathf.Max(cameraView.orthographicSize*2/nebula.sprite.bounds.size.y,cameraView.orthographicSize*2*cameraView.aspect/nebula.sprite.bounds.size.x)*1.14f;
   nebula.transform.localScale=Vector3.one*scale;
+  float aspect=cameraView.aspect;
+  // A rotation or window resize changes the framing the props were placed for; rebuild them.
+  if(Mathf.Abs(aspect-builtAspect)>.02f){builtAspect=aspect;BuildProps(worldIndex);}
   // Slow parallax drift. The 14% overscan leaves room to sway without ever exposing the art's edge,
-  // and a sine path means it never snaps back into view.
-  float t=Time.time,driftX=Mathf.Sin(t*.47f)*.60f,driftY=Mathf.Sin(t*.35f+1.7f)*.90f;
+  // and a sine path means it never snaps back into view. MotionScale calms it for reduced effects,
+  // and the accumulated clock stops dead while paused so the sky freezes with the starfield.
+  float dt=Paused?0f:Time.deltaTime;
+  motionBlend=Mathf.MoveTowards(motionBlend,MotionScale,dt*1.5f);float motion=motionBlend;
+  driftTime+=dt;
+  float driftX=Mathf.Sin(driftTime*.47f)*.60f*motion,driftY=Mathf.Sin(driftTime*.35f+1.7f)*.90f*motion;
   nebula.transform.localPosition=new Vector3(driftX,driftY,4);
   if(props)props.transform.localPosition=new Vector3(driftX*.45f,driftY*.45f,0);
-  float hw=cameraView.orthographicSize*cameraView.aspect,hh=cameraView.orthographicSize;
-  TickClouds(Time.deltaTime,hw,hh);
-  TickMeteors(Time.deltaTime,hw,hh);
+  float hw=cameraView.orthographicSize*aspect,hh=cameraView.orthographicSize,step=dt*motion;
+  TickClouds(step,hw,hh);
+  TickMeteors(step,hw,hh);
  }
  // Far-background dressing: drifting gas, two soft planets and a few slow meteors.
  // Everything is dim, slow and behind the action so it reads as depth, never as a threat.

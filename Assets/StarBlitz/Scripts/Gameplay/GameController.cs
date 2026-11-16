@@ -105,7 +105,7 @@ public sealed class GameController : MonoBehaviour {
  }
  void Update(){
   if(!catalog||Save==null)return;
-  FitCamera();float dt=Mathf.Min(Time.deltaTime,.05f);
+  FitCamera();if(backdrop){backdrop.MotionScale=Save.Value.reducedEffects?.35f:1f;backdrop.Paused=State==GameState.Paused;}float dt=Mathf.Min(Time.deltaTime,.05f);
   if(State!=GameState.Paused)TickStars(dt);
   if(State==GameState.Menu){player.transform.localRotation=Quaternion.Euler(0,0,Mathf.Sin(Time.time)*4);return;}
   InputReader.Poll();
