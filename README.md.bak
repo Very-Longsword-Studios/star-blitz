@@ -1,0 +1,52 @@
+# Star Blitz
+
+Star Blitz is a fast-paced, arcade-style space shooter (shmup) built with Unity. Players pilot customizable ships through hundreds of stages, battling waves of enemies and challenging multi-phase bosses.
+
+## 🚀 Features
+
+- **Extensive Content**: 288 missions featuring diverse enemy patterns and boss encounters.
+- **Ship Customization**: Unlock multiple ships and invest in permanent upgrades for damage, fire rate, movement speed, shield capacity, and bomb count.
+- **Dynamic Combat**:
+  - **Weapon Tiers**: Collect power-ups to increase your fire rate and projectile count.
+  - **Tactical Abilities**: Deploy shields for invulnerability and Nukes (Bombs) to clear the screen.
+  - **Utility Pickups**: Use magnets to collect currency and multipliers to boost your score.
+- **Boss Battles**: Complex boss fights with predictable health thresholds and evolving attack patterns (Spirals, Rings, Vortexes, etc.).
+- **Progression System**: Earn Coins and Gems during runs to fuel upgrades and unlock new ships.
+- **Mobile Optimized**: Integrated Ad services for reward doubling and optimized input for touch/pointer interaction.
+
+## 🛠 Technical Stack
+
+- **Engine**: Unity
+- **Language**: C#
+- **Architecture**: Controller-based gameplay logic with a decoupled data-driven approach using `GameCatalog` and `StageData`.
+- **Key Systems**:
+  - **Entity Pooling**: High-performance pooling for bullets, enemies, particles, and pickups to minimize GC pressure.
+  - **Data-Driven Design**: Stage configurations and ship stats are stored in ScriptableObjects for easy balancing and expansion.
+  - **State Management**: Finite State Machine for handling Menu, Playing, Paused, and Results states.
+
+## 🎮 Gameplay Mechanics
+
+- **Movement**: Pointer/Axis-based movement with clamped boundaries.
+- **Combat**: Auto-firing weapons with variable spreads and damage scaling based on ship upgrades.
+- **Scoring**: Points are awarded for enemy kills, with multipliers available via pickups.
+- **Star Rating**: Stages are rated 1-3 stars based on the remaining hull percentage upon victory.
+
+## 📁 Project Structure
+
+- `Assets/StarBlitz/Scripts/Gameplay`: Core game logic, including the `GameController` and entity behaviors.
+- `Assets/StarBlitz/Scripts/UI`: UI management and HUD feedback.
+- `Assets/StarBlitz/Scripts/Services`: Persistence (`SaveService`) and monetization (`AdsService`).
+- `Assets/StarBlitz/Data`: ScriptableObject configurations for ships, stages, and balance.
+- `Assets/StarBlitz/Tests`: Automated tests for input, content, and visual polish.
+
+## ⚙️ Setup & Installation
+
+1. Open the project in **Unity**.
+2. Ensure the **Google Mobile Ads SDK** is correctly configured if deploying to mobile.
+3. To validate the project setup:
+   - Navigate to the top menu: `Star Blitz` -> `Validate Project`.
+   - Use `Repair Scene and Prefab` if any dependencies are missing.
+4. Press **Play** to start the game.
+
+---
+*Developed by Nous Research (Hermes Agent)*
